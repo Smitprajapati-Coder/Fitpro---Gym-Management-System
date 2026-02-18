@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitPro - Smart Gym Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .heading-font {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-modern {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .card-modern:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin: 0 auto 16px;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .pricing-card.featured {
+            border: 2px solid #667eea;
+            transform: scale(1.05);
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification System -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Navigation -->
+    <nav class="glass-effect fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#667eea" stroke-width="2" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="#667eea" stroke-width="2" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="#667eea" stroke-width="2" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-white heading-font cursor-pointer" onclick="showPage('home')">FitPro</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" onclick="showPage('home')" class="nav-link">Home</a>
+                    <a href="#" onclick="showPage('plans')" class="nav-link">Plans</a>
+                    <a href="#" onclick="showPage('programs')" class="nav-link">Programs</a>
+                    <a href="#" onclick="showPage('trainers')" class="nav-link">Trainers</a>
+                    <a href="#" onclick="showPage('contact')" class="nav-link">Contact</a>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <div id="authButtons">
+                        <button onclick="showPage('login')" class="btn-secondary">Login</button>
+                        <button onclick="showPage('signup')" class="btn-primary">Sign Up</button>
+                    </div>
+                    <div id="userMenu" class="hidden flex items-center space-x-3">
+                        <span id="userName" class="text-white font-medium"></span>
+                        <button onclick="logout()" class="text-red-300 hover:text-red-200 font-medium">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="homePage" class="page active">
+        <!-- Hero Section -->
+        <section class="pt-16 min-h-screen flex items-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="text-white">
+                        <h1 class="text-5xl lg:text-6xl font-bold mb-6 heading-font">
+                            Smart Fitness
+                            <span class="block text-yellow-300">Management</span>
+                        </h1>
+                        <p class="text-xl text-gray-200 mb-8 leading-relaxed">
+                            Experience the future of fitness with our intelligent gym management system. 
+                            Track progress, book sessions, and achieve your goals with ease.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button onclick="showPage('plans')" class="btn-primary text-lg px-8 py-4">
+                                Explore Plans
+                            </button>
+                            <button onclick="showPage('admission')" class="btn-secondary text-lg px-8 py-4">
+                                Get Started
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <div class="card-modern p-8 text-center">
+                            <div class="feature-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-gray-800 mb-4 heading-font">24/7 Smart Access</h3>
+                            <p class="text-gray-600 mb-6">Advanced biometric access control with real-time monitoring and personalized workout tracking.</p>
+                            <div class="flex justify-center space-x-2">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
+                                <div class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4 heading-font">Why Choose FitPro?</h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">Advanced features designed for modern fitness enthusiasts</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="card-modern p-8 text-center">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Smart Analytics</h3>
+                        <p class="text-gray-600">Track your progress with AI-powered insights and personalized recommendations.</p>
+                    </div>
+                    
+                    <div class="card-modern p-8 text-center">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Goal Management</h3>
+                        <p class="text-gray-600">Set, track, and achieve your fitness goals with our intelligent goal-setting system.</p>
+                    </div>
+                    
+                    <div class="card-modern p-8 text-center">
+                        <div class="feature-icon">👥</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Expert Trainers</h3>
+                        <p class="text-gray-600">Connect with certified trainers and get personalized workout plans.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="stats-card">
+                        <div class="text-3xl font-bold text-gray-800 mb-2">2,500+</div>
+                        <div class="text-gray-600 font-medium">Active Members</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl font-bold text-gray-800 mb-2">50+</div>
+                        <div class="text-gray-600 font-medium">Expert Trainers</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl font-bold text-gray-800 mb-2">100+</div>
+                        <div class="text-gray-600 font-medium">Equipment</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl font-bold text-gray-800 mb-2">10+</div>
+                        <div class="text-gray-600 font-medium">Years Experience</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Plans Page -->
+    <div id="plansPage" class="page pt-16">
+        <section class="py-20 min-h-screen bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4 heading-font">Choose Your Plan</h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">Flexible membership options designed to fit your lifestyle and budget</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Basic Plan -->
+                    <div class="pricing-card">
+                        <div class="text-center">
+                            <h3 class="text-2xl font-semibold text-gray-800 mb-4 heading-font">Basic</h3>
+                            <div class="text-4xl font-bold text-gray-800 mb-6">$29<span class="text-lg text-gray-500">/month</span></div>
+                            <ul class="text-left space-y-3 mb-8">
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Gym Access (6AM - 10PM)</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Basic Equipment</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Locker Room</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Mobile App Access</li>
+                                <li class="flex items-center"><span class="text-gray-300 mr-3">✗</span> Personal Training</li>
+                                <li class="flex items-center"><span class="text-gray-300 mr-3">✗</span> Group Classes</li>
+                            </ul>
+                            <button onclick="selectPlan('basic', 29)" class="btn-secondary w-full">Choose Basic</button>
+                        </div>
+                    </div>
+
+                    <!-- Premium Plan -->
+                    <div class="pricing-card featured">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <span class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium">Most Popular</span>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-2xl font-semibold text-gray-800 mb-4 heading-font">Premium</h3>
+                            <div class="text-4xl font-bold text-gray-800 mb-6">$59<span class="text-lg text-gray-500">/month</span></div>
+                            <ul class="text-left space-y-3 mb-8">
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> 24/7 Gym Access</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> All Equipment Access</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Group Classes</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Nutrition Consultation</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> 2 Personal Training Sessions</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Guest Passes (2/month)</li>
+                            </ul>
+                            <button onclick="selectPlan('premium', 59)" class="btn-primary w-full">Choose Premium</button>
+                        </div>
+                    </div>
+
+                    <!-- Elite Plan -->
+                    <div class="pricing-card">
+                        <div class="text-center">
+                            <h3 class="text-2xl font-semibold text-gray-800 mb-4 heading-font">Elite</h3>
+                            <div class="text-4xl font-bold text-gray-800 mb-6">$99<span class="text-lg text-gray-500">/month</span></div>
+                            <ul class="text-left space-y-3 mb-8">
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Everything in Premium</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Unlimited Personal Training</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Meal Planning</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Recovery Services</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Priority Booking</li>
+                                <li class="flex items-center"><span class="text-green-500 mr-3">✓</span> Unlimited Guest Passes</li>
+                            </ul>
+                            <button onclick="selectPlan('elite', 99)" class="btn-primary w-full">Choose Elite</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Programs Page -->
+    <div id="programsPage" class="page pt-16">
+        <section class="py-20 min-h-screen bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4 heading-font">Fitness Programs</h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">Specialized programs designed by experts to help you achieve your fitness goals</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="card-modern p-8">
+                        <div class="feature-icon">🏋️</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Strength Training</h3>
+                        <p class="text-gray-600 mb-6">Build muscle and increase strength with progressive overload techniques and expert guidance.</p>
+                        <div class="mb-4">
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Beginner Friendly</span>
+                        </div>
+                        <button class="text-blue-600 font-medium hover:text-blue-700">Learn More →</button>
+                    </div>
+                    
+                    <div class="card-modern p-8">
+                        <div class="feature-icon">🏃</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Cardio Fitness</h3>
+                        <p class="text-gray-600 mb-6">Improve cardiovascular health with high-intensity interval training and endurance workouts.</p>
+                        <div class="mb-4">
+                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">High Intensity</span>
+                        </div>
+                        <button class="text-blue-600 font-medium hover:text-blue-700">Learn More →</button>
+                    </div>
+                    
+                    <div class="card-modern p-8">
+                        <div class="feature-icon">🧘</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Yoga & Flexibility</h3>
+                        <p class="text-gray-600 mb-6">Enhance flexibility, balance, and mindfulness through various yoga styles and stretching routines.</p>
+                        <div class="mb-4">
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Relaxing</span>
+                        </div>
+                        <button class="text-blue-600 font-medium hover:text-blue-700">Learn More →</button>
+                    </div>
+                    
+                    <div class="card-modern p-8">
+                        <div class="feature-icon">🥊</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Boxing & MMA</h3>
+                        <p class="text-gray-600 mb-6">Learn self-defense while getting an intense full-body workout with professional trainers.</p>
+                        <div class="mb-4">
+                            <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">Advanced</span>
+                        </div>
+                        <button class="text-blue-600 font-medium hover:text-blue-700">Learn More →</button>
+                    </div>
+                    
+                    <div class="card-modern p-8">
+                        <div class="feature-icon">🏊</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Aqua Fitness</h3>
+                        <p class="text-gray-600 mb-6">Low-impact water-based exercises perfect for rehabilitation and joint-friendly workouts.</p>
+                        <div class="mb-4">
+                            <span class="bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full text-sm font-medium">Low Impact</span>
+                        </div>
+                        <button class="text-blue-600 font-medium hover:text-blue-700">Learn More →</button>
+                    </div>
+                    
+                    <div class="card-modern p-8">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Personal Training</h3>
+                        <p class="text-gray-600 mb-6">One-on-one sessions with certified trainers for personalized workout plans and faster results.</p>
+                        <div class="mb-4">
+                            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">Personalized</span>
+                        </div>
+                        <button class="text-blue-600 font-medium hover:text-blue-700">Learn More →</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Trainers Page -->
+    <div id="trainersPage" class="page pt-16">
+        <section class="py-20 min-h-screen bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4 heading-font">Expert Trainers</h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">Meet our certified fitness professionals dedicated to helping you achieve your goals</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="card-modern p-8 text-center">
+                        <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl text-white">
+                            👨‍💼
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Mike Johnson</h3>
+                        <p class="text-blue-600 font-medium mb-3">Strength & Conditioning Coach</p>
+                        <p class="text-gray-600 mb-4">8+ years experience in powerlifting and strength training. Certified NASM-CPT.</p>
+                        <div class="mb-4">
+                            <div class="flex justify-center space-x-2 mb-2">
+                                <span class="text-yellow-400">⭐⭐⭐⭐⭐</span>
+                            </div>
+                            <p class="text-sm text-gray-500">4.9/5 rating (127 reviews)</p>
+                        </div>
+                        <button onclick="bookTrainer('Mike Johnson')" class="btn-primary w-full">Book Session</button>
+                    </div>
+                    
+                    <div class="card-modern p-8 text-center">
+                        <div class="w-24 h-24 bg-gradient-to-br from-pink-400 to-red-500 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl text-white">
+                            👩‍💼
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Sarah Davis</h3>
+                        <p class="text-blue-600 font-medium mb-3">Yoga & Wellness Instructor</p>
+                        <p class="text-gray-600 mb-4">Certified RYT-500 yoga instructor specializing in Hatha and Vinyasa yoga styles.</p>
+                        <div class="mb-4">
+                            <div class="flex justify-center space-x-2 mb-2">
+                                <span class="text-yellow-400">⭐⭐⭐⭐⭐</span>
+                            </div>
+                            <p class="text-sm text-gray-500">4.8/5 rating (89 reviews)</p>
+                        </div>
+                        <button onclick="bookTrainer('Sarah Davis')" class="btn-primary w-full">Book Session</button>
+                    </div>
+                    
+                    <div class="card-modern p-8 text-center">
+                        <div class="w-24 h-24 bg-gradient-to-br from-green-400 to-blue-500 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl text-white">
+                            👨‍💼
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Alex Rodriguez</h3>
+                        <p class="text-blue-600 font-medium mb-3">HIIT & Cardio Specialist</p>
+                        <p class="text-gray-600 mb-4">High-energy trainer focused on cardiovascular fitness and metabolic conditioning.</p>
+                        <div class="mb-4">
+                            <div class="flex justify-center space-x-2 mb-2">
+                                <span class="text-yellow-400">⭐⭐⭐⭐⭐</span>
+                            </div>
+                            <p class="text-sm text-gray-500">4.9/5 rating (156 reviews)</p>
+                        </div>
+                        <button onclick="bookTrainer('Alex Rodriguez')" class="btn-primary w-full">Book Session</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="page pt-16">
+        <section class="min-h-screen flex items-center justify-center py-12 px-4">
+            <div class="max-w-md w-full">
+                <div class="card-modern p-8">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800 heading-font">Welcome Back</h2>
+                        <p class="mt-2 text-gray-600">Sign in to your account</p>
+                    </div>
+
+                    <!-- Login Tabs -->
+                    <div class="flex space-x-2 mb-6">
+                        <button onclick="showLoginTab('email')" id="emailLoginTab" class="tab-btn active flex-1">Email</button>
+                        <button onclick="showLoginTab('mobile')" id="mobileLoginTab" class="tab-btn flex-1">Mobile</button>
+                        <button onclick="showLoginTab('gymid')" id="gymidLoginTab" class="tab-btn flex-1">Gym ID</button>
+                    </div>
+
+                    <!-- Email Login Form -->
+                    <form id="emailLoginForm" class="login-form space-y-4" onsubmit="handleLogin(event, 'email')">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <input name="email" type="email" required class="form-input" placeholder="Enter your email">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <input name="password" type="password" required class="form-input" placeholder="Enter your password">
+                        </div>
+                        <button type="submit" class="btn-primary w-full">Sign In</button>
+                    </form>
+
+                    <!-- Mobile Login Form -->
+                    <form id="mobileLoginForm" class="login-form space-y-4 hidden" onsubmit="handleLogin(event, 'mobile')">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
+                            <input name="mobile" type="tel" required class="form-input" placeholder="Enter mobile number">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">OTP</label>
+                            <div class="flex space-x-2">
+                                <input name="otp" type="text" required class="form-input flex-1" placeholder="Enter OTP">
+                                <button type="button" onclick="sendOTP('login')" class="btn-secondary">Send OTP</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary w-full">Sign In</button>
+                    </form>
+
+                    <!-- Gym ID Login Form -->
+                    <form id="gymidLoginForm" class="login-form space-y-4 hidden" onsubmit="handleLogin(event, 'gymid')">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gym ID</label>
+                            <input name="gymid" type="text" required class="form-input" placeholder="Enter Gym ID">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <input name="password" type="password" required class="form-input" placeholder="Enter password">
+                        </div>
+                        <button type="submit" class="btn-primary w-full">Sign In</button>
+                    </form>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-600">
+                            Don't have an account? 
+                            <a href="#" onclick="showPage('signup')" class="text-blue-600 hover:text-blue-700 font-medium">Sign up</a>
+                        </p>
+                    </div>
+
+                    <!-- Quick Demo -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <p class="text-center text-sm text-gray-500 mb-3">Quick Demo Access:</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="quickLogin('member')" class="btn-secondary text-sm">Demo Member</button>
+                            <button onclick="quickLogin('admin')" class="btn-secondary text-sm">Demo Admin</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Sign Up Page -->
+    <div id="signupPage" class="page pt-16">
+        <section class="min-h-screen flex items-center justify-center py-12 px-4">
+            <div class="max-w-md w-full">
+                <div class="card-modern p-8">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800 heading-font">Join FitPro</h2>
+                        <p class="mt-2 text-gray-600">Create your account today</p>
+                    </div>
+
+                    <form onsubmit="handleSignup(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <input name="name" type="text" required class="form-input" placeholder="Enter your full name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <input name="email" type="email" required class="form-input" placeholder="Enter your email">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                            <input name="phone" type="tel" required class="form-input" placeholder="Enter phone number">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <input name="password" type="password" required class="form-input" placeholder="Create password">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                            <input name="confirmPassword" type="password" required class="form-input" placeholder="Confirm password">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" required class="h-4 w-4 text-blue-600 rounded border-gray-300">
+                            <label class="ml-2 text-sm text-gray-600">
+                                I agree to the <a href="#" class="text-blue-600 hover:text-blue-700">Terms & Conditions</a>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-primary w-full">Create Account</button>
+                    </form>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-600">
+                            Already have an account? 
+                            <a href="#" onclick="showPage('login')" class="text-blue-600 hover:text-blue-700 font-medium">Sign in</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Admission Page -->
+    <div id="admissionPage" class="page pt-16">
+        <section class="min-h-screen py-12 px-4 bg-gray-50">
+            <div class="max-w-2xl mx-auto">
+                <div class="card-modern p-8">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800 heading-font">Membership Application</h2>
+                        <p class="mt-2 text-gray-600">Complete your gym membership registration</p>
+                    </div>
+                    
+                    <form onsubmit="handleAdmission(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                <input name="firstName" type="text" required class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                <input name="lastName" type="text" required class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input name="email" type="email" required class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                                <input name="phone" type="tel" required class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                                <input name="age" type="number" min="16" max="100" required class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                                <select name="gender" required class="form-input">
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                            <textarea name="address" rows="3" required class="form-input"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fitness Goals</label>
+                            <select name="goals" required class="form-input">
+                                <option value="">Select Primary Goal</option>
+                                <option value="weight-loss">Weight Loss</option>
+                                <option value="muscle-gain">Muscle Gain</option>
+                                <option value="general-fitness">General Fitness</option>
+                                <option value="strength-training">Strength Training</option>
+                                <option value="endurance">Endurance</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Experience Level</label>
+                            <select name="experience" required class="form-input">
+                                <option value="">Select Experience</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Medical Conditions (Optional)</label>
+                            <textarea name="medical" rows="3" class="form-input" placeholder="Any medical conditions or injuries we should know about"></textarea>
+                        </div>
+
+                        <div class="flex items-center">
+                            <input type="checkbox" required class="h-4 w-4 text-blue-600 rounded border-gray-300">
+                            <label class="ml-2 text-sm text-gray-600">
+                                I acknowledge the liability waiver and gym rules
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn-primary w-full">Submit Application</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Payment Page -->
+    <div id="paymentPage" class="page pt-16">
+        <section class="min-h-screen py-12 px-4 bg-gray-50">
+            <div class="max-w-2xl mx-auto">
+                <div class="card-modern overflow-hidden">
+                    <!-- Order Summary -->
+                    <div class="bg-gray-50 px-6 py-4 border-b">
+                        <h3 class="text-lg font-semibold text-gray-900">Order Summary</h3>
+                        <div id="orderSummary" class="mt-2 flex justify-between">
+                            <span id="selectedPlanName">Premium Plan</span>
+                            <span id="selectedPlanPrice">$59/month</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Form -->
+                    <form class="p-6 space-y-6" onsubmit="handlePayment(event)">
+                        <div>
+                            <h4 class="text-lg font-medium text-gray-900 mb-4">Payment Information</h4>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                            <input id="cardNumber" name="cardNumber" type="text" placeholder="1234 5678 9012 3456" required class="form-input">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                                <input id="expiryDate" name="expiryDate" type="text" placeholder="MM/YY" required class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                                <input name="cvv" type="text" placeholder="123" required class="form-input">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+                            <input name="cardName" type="text" placeholder="John Doe" required class="form-input">
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-medium text-gray-900 mb-4">Billing Address</h4>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                            <input name="billingAddress" type="text" required class="form-input">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                <input name="billingCity" type="text" required class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
+                                <input name="billingZip" type="text" required class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="border-t pt-6">
+                            <button type="submit" class="btn-primary w-full text-lg py-4">Complete Payment</button>
+                            <p class="mt-2 text-xs text-gray-500 text-center">🔒 Secure payment processing</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Member Dashboard -->
+    <div id="memberPage" class="page pt-16">
+        <section class="min-h-screen py-8 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800 heading-font">Welcome back, <span id="memberName">Member</span>!</h1>
+                    <p class="text-gray-600">Track your fitness journey and achieve your goals</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="stats-card">
+                        <div class="text-3xl mb-2">🏃</div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">12</div>
+                        <div class="text-gray-600 text-sm">Workouts This Month</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl mb-2">⏱️</div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">24h</div>
+                        <div class="text-gray-600 text-sm">Total Hours</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl mb-2">🔥</div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">3,450</div>
+                        <div class="text-gray-600 text-sm">Calories Burned</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl mb-2">🎯</div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">75%</div>
+                        <div class="text-gray-600 text-sm">Goal Progress</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="card-modern p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Book Training Session</h3>
+                        <p class="text-gray-600 mb-4">Schedule with expert trainers</p>
+                        <button onclick="showPage('trainers')" class="btn-primary">Book Now</button>
+                    </div>
+                    <div class="card-modern p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Upgrade Membership</h3>
+                        <p class="text-gray-600 mb-4">Access premium features</p>
+                        <button onclick="showPage('plans')" class="btn-secondary">View Plans</button>
+                    </div>
+                    <div class="card-modern p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Track Progress</h3>
+                        <p class="text-gray-600 mb-4">Log workouts and measurements</p>
+                        <button class="btn-primary">Log Workout</button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card-modern p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="text-2xl">🏋️</div>
+                            <div>
+                                <p class="font-medium text-gray-800">Strength Training</p>
+                                <p class="text-sm text-gray-500">Yesterday, 6:00 PM - 7:30 PM</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="text-2xl">🧘</div>
+                            <div>
+                                <p class="font-medium text-gray-800">Yoga Class</p>
+                                <p class="text-sm text-gray-500">Monday, 8:00 AM - 9:00 AM</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="text-2xl">🏃</div>
+                            <div>
+                                <p class="font-medium text-gray-800">Cardio Session</p>
+                                <p class="text-sm text-gray-500">Sunday, 7:00 AM - 8:00 AM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminPage" class="page pt-16">
+        <section class="min-h-screen py-8 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800 heading-font">Admin Dashboard</h1>
+                    <p class="text-gray-600">Manage gym operations and members</p>
+                </div>
+
+                <!-- Admin Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="stats-card">
+                        <div class="text-3xl mb-2">👥</div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">1,234</div>
+                        <div class="text-gray-600 text-sm">Total Members</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl mb-2">💰</div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">$45,678</div>
+                        <div class="text-gray-600 text-sm">Monthly Revenue</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl mb-2">📅</div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">89</div>
+                        <div class="text-gray-600 text-sm">Today's Check-ins</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl mb-2">🏋️</div>
+                        <div class="text-2xl font-bold text-gray-800 mb-1">15</div>
+                        <div class="text-gray-600 text-sm">Active Trainers</div>
+                    </div>
+                </div>
+
+                <!-- Management Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="card-modern p-6 text-center">
+                        <div class="feature-icon">👥</div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Member Management</h3>
+                        <p class="text-gray-600 mb-4">Manage member profiles and memberships</p>
+                        <button class="btn-primary">Manage Members</button>
+                    </div>
+                    
+                    <div class="card-modern p-6 text-center">
+                        <div class="feature-icon">🏋️</div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Trainer Management</h3>
+                        <p class="text-gray-600 mb-4">Schedule and assign trainers</p>
+                        <button class="btn-primary">Manage Trainers</button>
+                    </div>
+                    
+                    <div class="card-modern p-6 text-center">
+                        <div class="feature-icon">💳</div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Payment Management</h3>
+                        <p class="text-gray-600 mb-4">Track payments and billing</p>
+                        <button class="btn-primary">View Payments</button>
+                    </div>
+                    
+                    <div class="card-modern p-6 text-center">
+                        <div class="feature-icon">⚙️</div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Equipment Management</h3>
+                        <p class="text-gray-600 mb-4">Monitor equipment status</p>
+                        <button class="btn-primary">Manage Equipment</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Contact Page -->
+    <div id="contactPage" class="page pt-16">
+        <section class="py-20 min-h-screen bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4 heading-font">Get In Touch</h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">Have questions? We're here to help you on your fitness journey</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-6">Contact Information</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="feature-icon text-lg">📍</div>
+                                <div>
+                                    <p class="font-medium text-gray-800">Address</p>
+                                    <p class="text-gray-600">123 Fitness Street, Health City, HC 12345</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="feature-icon text-lg">📞</div>
+                                <div>
+                                    <p class="font-medium text-gray-800">Phone</p>
+                                    <p class="text-gray-600">(555) 123-4567</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="feature-icon text-lg">✉️</div>
+                                <div>
+                                    <p class="font-medium text-gray-800">Email</p>
+                                    <p class="text-gray-600">info@fitpro.com</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="feature-icon text-lg">🕒</div>
+                                <div>
+                                    <p class="font-medium text-gray-800">Hours</p>
+                                    <p class="text-gray-600">Mon-Sun: 5:00 AM - 11:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-modern p-8">
+                        <form onsubmit="handleContact(event)" class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                                <input name="name" type="text" required class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input name="email" type="email" required class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                                <input name="subject" type="text" required class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                <textarea name="message" rows="4" required class="form-input"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary w-full">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Global state
+        let selectedPlan = null;
+
+        // Page navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            const targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+        }
+
+        // Authentication functions
+        function handleLogin(event, loginType = 'email') {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            let userName = '';
+            let userEmail = '';
+            
+            if (loginType === 'email') {
+                userEmail = formData.get('email');
+                userName = userEmail.split('@')[0];
+            } else if (loginType === 'mobile') {
+                const mobile = formData.get('mobile');
+                userName = 'User_' + mobile.slice(-4);
+                userEmail = mobile + '@mobile.gym';
+            } else if (loginType === 'gymid') {
+                const gymId = formData.get('gymid');
+                userName = gymId;
+                userEmail = gymId + '@gym.local';
+            }
+            
+            currentUser = {
+                name: userName,
+                email: userEmail,
+                type: 'member',
+                loginMethod: loginType
+            };
+            
+            updateAuthUI();
+            showNotification('Login successful! Welcome back.', 'success');
+            showPage('member');
+        }
+
+        function handleSignup(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    fetch("signup.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            currentUser = { name: formData.get("name"), email: formData.get("email") };
+            updateAuthUI();
+            showNotification(data.message, "success");
+            showPage("member");
+        } else {
+            showNotification(data.message, "error");
+        }
+    })
+    .catch(() => showNotification("Server error", "error"));
+}
+
+
+        function handleLogin(event, loginType = "email") {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    fetch("login.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            currentUser = { name: data.name, email: formData.get("email") };
+            updateAuthUI();
+            showNotification("Login successful!", "success");
+            showPage("member");
+        } else {
+            showNotification(data.message, "error");
+        }
+    })
+    .catch(() => showNotification("Server error", "error"));
+}
+
+
+        function sendOTP(type) {
+    const form = document.getElementById(type === "login" ? "mobileLoginForm" : "mobileSignupForm");
+    const phone = form.querySelector('input[name="mobile"]')?.value || form.querySelector('input[name="phone"]')?.value;
+
+    if (!phone) {
+        showNotification("Please enter a mobile number first.", "error");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("phone", phone);
+    formData.append("purpose", type);
+
+    fetch("send_otp.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            showNotification(data.message, "success");
+        } else {
+            showNotification(data.message, "error");
+        }
+    })
+    .catch(() => showNotification("Server error", "error"));
+}
+
+function handleLogin(event, loginType = "email") {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    if (loginType === "mobile") {
+        fetch("verify_otp.php", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                currentUser = { name: "User_" + formData.get("mobile").slice(-4), email: formData.get("mobile")+"@mobile.gym" };
+                updateAuthUI();
+                showNotification("Login successful!", "success");
+                showPage("member");
+            } else {
+                showNotification(data.message, "error");
+            }
+        });
+        return;
+    }
+
+    // email/gymid login stays same...
+}
+
+
+        function quickLogin(type) {
+    const formData = new FormData();
+    formData.append("type", type);
+
+    fetch("quick_login.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            currentUser = {
+                name: data.user.name,
+                email: data.user.email,
+                type: data.type
+            };
+            updateAuthUI();
+            showPage(type);
+            showNotification(`Logged in as ${data.type}!`, "success");
+        } else {
+            showNotification(data.message, "error");
+        }
+    })
+    .catch(() => showNotification("Server error", "error"));
+}
+
+let currentUser = null;
+
+// Call this on page load to check if user is logged in
+function checkAuth() {
+    fetch('session.php', {
+        method: 'GET',
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.user) {
+            currentUser = data.user;
+        } else {
+            currentUser = null;
+        }
+        updateAuthUI();
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateAuthUI() {
+    const authButtons = document.getElementById('authButtons');
+    const userMenu = document.getElementById('userMenu');
+    const userName = document.getElementById('userName');
+    const memberName = document.getElementById('memberName');
+    
+    if (currentUser) {
+        authButtons.classList.add('hidden');
+        userMenu.classList.remove('hidden');
+        userName.textContent = currentUser.name;
+        if (memberName) memberName.textContent = currentUser.name;
+    } else {
+        authButtons.classList.remove('hidden');
+        userMenu.classList.add('hidden');
+    }
+}
+
+// Logout function
+function logout() {
+    fetch('logout.php', { method: 'POST', credentials: 'include' })
+    .then(response => response.json())
+    .then(data => {
+        currentUser = null;
+        updateAuthUI();
+        alert(data.message); // notification
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Run checkAuth on page load
+window.addEventListener('DOMContentLoaded', checkAuth);
+
+        // Plan selection
+function selectPlan(planType, price) {
+    selectedPlan = {
+        type: planType,
+        price: price,
+        name: planType.charAt(0).toUpperCase() + planType.slice(1) + ' Plan'
+    };
+
+    // Update UI
+    document.getElementById('selectedPlanName').textContent = selectedPlan.name;
+    document.getElementById('selectedPlanPrice').textContent = `$${price}/month`;
+
+    // Save to backend
+    const formData = new FormData();
+    formData.append("plan", selectedPlan.name);
+    formData.append("price", selectedPlan.price);
+    formData.append("email", currentUser ? currentUser.email : "guest@fitpro.com");
+
+    fetch("select_plan.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            showNotification(`${selectedPlan.name} selected! Proceed to payment.`, "success");
+        } else {
+            showNotification(data.message, "error");
+        }
+    })
+    .catch(() => showNotification("Server error", "error"));
+
+    // Move to payment page
+    showPage("payment");
+}
+
+
+        function handleAdmission(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    fetch("admission.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            showNotification(data.message, "success");
+            setTimeout(() => showPage("home"), 2000);
+        } else {
+            showNotification(data.message, "error");
+        }
+    })
+    .catch(() => showNotification("Server error", "error"));
+}
+
+
+        function handlePayment(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    // add plan info + user info if available
+    if (selectedPlan) {
+        formData.append("plan", selectedPlan.name);
+        formData.append("price", selectedPlan.price);
+    } else {
+        formData.append("plan", "Unknown");
+        formData.append("price", "0");
+    }
+
+    if (currentUser) {
+        formData.append("email", currentUser.email);
+    } else {
+        formData.append("email", "guest@fitpro.com");
+    }
+
+    fetch("payment.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            showNotification(data.message, "success");
+            setTimeout(() => {
+                if (!currentUser) {
+                    showPage("signup");
+                } else {
+                    showPage("member");
+                }
+            }, 2000);
+        } else {
+            showNotification(data.message, "error");
+        }
+    })
+    .catch(() => showNotification("Server error", "error"));
+}
+
+function handleContact(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    fetch("contact.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            showNotification(data.message, "success");
+            event.target.reset();
+        } else {
+            showNotification(data.message, "error");
+        }
+    })
+    .catch(() => showNotification("Server error", "error"));
+}
+
+        function bookTrainer(trainerName) {
+    if (!currentUser) {
+        showNotification('Please login to book a training session.', 'error');
+        showPage('login');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("trainer", trainerName);
+    formData.append("email", currentUser.email);
+
+    fetch("book_trainer.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            showNotification(data.message, "success");
+        } else {
+            showNotification(data.message, "error");
+        }
+    })
+    .catch(() => showNotification("Server error", "error"));
+}
+
+// Page switching and authentication UI
+function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+    if(page === 'home') page = 'homePage';
+    else if(page === 'plans') page = 'plansPage';
+    else if(page === 'programs') page = 'programsPage';
+    else if(page === 'trainers') page = 'trainersPage';
+    else if(page === 'login') page = 'loginPage';
+    else if(page === 'signup') page = 'signupPage';
+
+    const selectedPage = document.getElementById(page);
+    if(selectedPage) selectedPage.classList.add('active');
+}
+
+// Login Tab Switching
+function showLoginTab(type) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.login-form').forEach(f => f.classList.add('hidden'));
+
+    if(type === 'email') {
+        document.getElementById('emailLoginTab').classList.add('active');
+        document.getElementById('emailLoginForm').classList.remove('hidden');
+    } else if(type === 'mobile') {
+        document.getElementById('mobileLoginTab').classList.add('active');
+        document.getElementById('mobileLoginForm').classList.remove('hidden');
+    } else if(type === 'gymid') {
+        document.getElementById('gymidLoginTab').classList.add('active');
+        document.getElementById('gymidLoginForm').classList.remove('hidden');
+    }
+}
+
+// Notification
+function notify(message, type='success') {
+    const notif = document.getElementById('notification');
+    notif.innerText = message;
+    notif.className = 'notification show ' + type;
+    setTimeout(() => notif.classList.remove('show'), 3000);
+}
+
+// Update auth UI based on session
+function updateAuthUI(user=null) {
+    const authButtons = document.getElementById('authButtons');
+    const userMenu = document.getElementById('userMenu');
+    const userName = document.getElementById('userName');
+
+    if(user) {
+        authButtons.classList.add('hidden');
+        userMenu.classList.remove('hidden');
+        userName.innerText = user.name;
+    } else {
+        authButtons.classList.remove('hidden');
+        userMenu.classList.add('hidden');
+    }
+}
+
+// Logout
+function logout() {
+    fetch('logout.php', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                updateAuthUI(null);
+                showPage('home');
+                notify('Logged out successfully');
+            }
+        });
+}
+async function handleLogin(e, type) {
+    e.preventDefault();
+    let form;
+    if(type === 'email') form = document.getElementById('emailLoginForm');
+    else if(type === 'mobile') form = document.getElementById('mobileLoginForm');
+    else form = document.getElementById('gymidLoginForm');
+
+    const formData = new FormData(form);
+    formData.append('loginType', type);
+
+    const response = await fetch('login.php', {
+        method: 'POST',
+        body: formData
+    });
+    const data = await response.json();
+
+    if(data.status === 'success') {
+        updateAuthUI(data.user);
+        showPage('home');
+        notify(data.message, 'success');
+    } else {
+        notify(data.message, 'error');
+    }
+}
+
+
+        // Notification system
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Format card number input
+            const cardNumberInput = document.getElementById('cardNumber');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+                    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                    e.target.value = formattedValue;
+                });
+            }
+
+            // Format expiry date input
+            const expiryInput = document.getElementById('expiryDate');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98116b43e38e7956',t:'MTc1ODIwNDU0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
